@@ -291,9 +291,18 @@
             font-size: 24px;
             margin: 20px 0;
         }
+
+        .hidden-input {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+        }
     </style>
 </head>
 <body>
+    <!-- Скрытое поле для ввода с клавиатуры -->
+    <input type="text" class="hidden-input" id="keyboardInput" placeholder="Введите штрихкод">
+
     <!-- ЭКРАН ВВОДА ПАРОЛЯ -->
     <div class="screen active" id="loginScreen">
         <div class="header">вход в систему</div>
@@ -370,6 +379,8 @@
         
         <div class="password-display" id="barcodeDisplay"></div>
         <input type="hidden" id="barcodeInput">
+        
+        <div class="info-text">введите 12 цифр штрихкода с клавиатуры или используйте кнопки ниже</div>
         
         <div class="keypad">
             <button class="keypad-button" onclick="addBarcodeNumber('1')">1</button>
@@ -513,6 +524,8 @@
         let currentUserName = 'Елена';
         let scanHistory = JSON.parse(localStorage.getItem('scanHistory')) || [];
         let countdownInterval = null;
+        let keyboardBuffer = '';
+        let keyboardTimeout = null;
         
         // Демо-база данных пользователей
         const userDatabase = {
@@ -592,6 +605,18 @@
                     if (element) element.textContent = currentUserName;
                 });
             }
+            
+            // Фокусируем скрытое поле для ввода с клавиатуры на нужных экранах
+            const keyboardInput = document.getElementById('keyboardInput');
+            if (screenId === 'manualInputScreen' || screenId === 'userInfoScreen') {
+                setTimeout(() => {
+                    keyboardInput.focus();
+                    keyboardInput.value = '';
+                    keyboardBuffer = '';
+                }, 100);
+            } else {
+                keyboardInput.blur();
+            }
         }
         
         function showMainScreen() {
@@ -637,12 +662,66 @@
         function clearBarcode() {
             document.getElementById('barcodeInput').value = '';
             document.getElementById('barcodeDisplay').textContent = '';
+            keyboardBuffer = '';
         }
         
         function deleteLastBarcode() {
             const input = document.getElementById('barcodeInput');
             input.value = input.value.slice(0, -1);
             document.getElementById('barcodeDisplay').textContent = input.value;
+        }
+        
+        // Обработка ввода с клавиатуры
+        function setupKeyboardListener() {
+            const keyboardInput = document.getElementById('keyboardInput');
+            
+            keyboardInput.addEventListener('input', function(e) {
+                const value = this.value;
+                
+                // Если на экране ручного ввода штрихкода
+                if (document.getElementById('manualInputScreen').classList.contains('active')) {
+                    // Обрабатываем только цифры
+                    const digits = value.replace(/\D/g, '');
+                    
+                    if (digits.length > 0) {
+                        document.getElementById('barcodeInput').value = digits.slice(0, 12);
+                        document.getElementById('barcodeDisplay').textContent = digits.slice(0, 12);
+                        
+                        // Автоматический поиск при вводе 12 цифр
+                        if (digits.length >= 12) {
+                            setTimeout(() => {
+                                findUserByBarcode();
+                            }, 100);
+                        }
+                    }
+                    
+                    this.value = '';
+                }
+                
+                // Если на экране информации о клиенте - обрабатываем ввод для суммы покупки и бонусов
+                if (document.getElementById('userInfoScreen').classList.contains('active')) {
+                    // Здесь можно добавить обработку для других полей ввода если нужно
+                    this.value = '';
+                }
+            });
+            
+            // Обработка специальных клавиш
+            keyboardInput.addEventListener('keydown', function(e) {
+                // Enter - поиск клиента на экране ручного ввода
+                if (e.key === 'Enter' && document.getElementById('manualInputScreen').classList.contains('active')) {
+                    e.preventDefault();
+                    findUserByBarcode();
+                }
+                
+                // Escape - назад
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    if (document.getElementById('manualInputScreen').classList.contains('active') || 
+                        document.getElementById('userInfoScreen').classList.contains('active')) {
+                        showMainScreen();
+                    }
+                }
+            });
         }
         
         // Поиск пользователя по штрихкоду
@@ -880,6 +959,7 @@
         
         // Инициализация
         showScreen('loginScreen');
+        setupKeyboardListener();
     </script>
 </body>
 </html>
