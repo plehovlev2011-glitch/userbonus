@@ -1,0 +1,8 @@
+{
+  "name": "bonus-system",
+  "version": "1.0.0",
+  "description": "Bonus system for client and admin",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
