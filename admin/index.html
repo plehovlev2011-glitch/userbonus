@@ -47,31 +47,85 @@
             background: #c0c0c0;
             padding: 20px;
             border: 2px solid #000;
-            margin: 50px auto;
-            width: 300px;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 400px;
         }
         
-        .login-input {
-            width: 100%;
-            padding: 10px;
-            font-size: 18px;
+        .user-list {
             margin: 10px 0;
-            border: 2px solid #000;
-            background: #fff;
         }
         
-        .login-button {
+        .user-button {
             width: 100%;
             padding: 15px;
             font-size: 16px;
             background: #c0c0c0;
             border: 2px solid #000;
             cursor: pointer;
-            margin-top: 10px;
+            margin: 5px 0;
+            text-align: center;
         }
         
-        .login-button:active {
+        .user-button:active {
             background: #a0a0a0;
+        }
+        
+        .password-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            margin: 10px 0;
+            border: 2px solid #000;
+            background: #fff;
+            text-align: center;
+        }
+        
+        .password-display {
+            font-size: 24px;
+            letter-spacing: 5px;
+            text-align: center;
+            margin: 10px 0;
+            min-height: 40px;
+        }
+        
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin: 10px 0;
+        }
+        
+        .keypad-button {
+            padding: 20px;
+            font-size: 18px;
+            background: #c0c0c0;
+            border: 2px solid #000;
+            cursor: pointer;
+        }
+        
+        .keypad-button:active {
+            background: #a0a0a0;
+        }
+        
+        .action-button {
+            background: #c0c0c0;
+            color: #000;
+            border: 2px solid #000;
+            padding: 15px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px 0;
+            width: 100%;
+        }
+        
+        .green-button {
+            background: #00ff00;
+        }
+        
+        .red-button {
+            background: #ff0000;
+            color: #fff;
         }
         
         .status-bar {
@@ -128,26 +182,6 @@
             background: #a0a0a0;
         }
         
-        .action-button {
-            background: #c0c0c0;
-            color: #000;
-            border: 2px solid #000;
-            padding: 15px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 5px 0;
-            width: 100%;
-        }
-        
-        .green-button {
-            background: #00ff00;
-        }
-        
-        .red-button {
-            background: #ff0000;
-            color: #fff;
-        }
-        
         .user-info {
             background: #c0c0c0;
             padding: 15px;
@@ -189,98 +223,165 @@
             color: #000;
             margin: 5px 0;
         }
+        
+        .history-list {
+            background: #fff;
+            border: 2px solid #000;
+            margin: 10px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid #000;
+            font-size: 12px;
+        }
+        
+        .developer-section {
+            background: #c0c0c0;
+            padding: 15px;
+            border: 2px solid #000;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
-    <!-- ЭКРАН ВХОДА -->
-    <div class="screen active" id="loginScreen">
-        <div class="header">БОНУСНАЯ СИСТЕМА "ПЕРЕЦ"</div>
+    <!-- ЭКРАН ВЫБОРА ПОЛЬЗОВАТЕЛЯ -->
+    <div class="screen active" id="userSelectScreen">
+        <div class="header">бонусная система "перец"</div>
         
         <div class="login-form">
-            <div class="info-text">Кассир: Елена</div>
-            <div class="info-text">Введите четырехзначный код:</div>
-            <input type="password" class="login-input" id="loginCode" maxlength="4" placeholder="5901">
-            <button class="login-button" onclick="checkLogin()">ВХОД</button>
-            <div class="info-text" id="loginError" style="color:red; display:none;">Неверный код!</div>
+            <div class="info-text">выберите пользователя:</div>
+            
+            <div class="user-list">
+                <button class="user-button" onclick="selectUser('Елена')">Елена</button>
+                <button class="user-button" onclick="selectUser('developer')">developer</button>
+            </div>
+            
+            <button class="action-button" onclick="showUserManager()">менеджер пользователей</button>
         </div>
     </div>
 
-    <!-- ГЛАВНЫЙ ЭКРАН -->
+    <!-- ЭКРАН ВВОДА ПАРОЛЯ -->
+    <div class="screen" id="loginScreen">
+        <div class="header">вход в систему</div>
+        
+        <div class="login-form">
+            <div class="info-text">пользователь: <span id="currentUser">-</span></div>
+            <div class="info-text">введите пароль:</div>
+            
+            <div class="password-display" id="passwordDisplay">*</div>
+            <input type="hidden" id="passwordInput">
+            
+            <div class="keypad">
+                <button class="keypad-button" onclick="addPasswordNumber('1')">1</button>
+                <button class="keypad-button" onclick="addPasswordNumber('2')">2</button>
+                <button class="keypad-button" onclick="addPasswordNumber('3')">3</button>
+                <button class="keypad-button" onclick="addPasswordNumber('4')">4</button>
+                <button class="keypad-button" onclick="addPasswordNumber('5')">5</button>
+                <button class="keypad-button" onclick="addPasswordNumber('6')">6</button>
+                <button class="keypad-button" onclick="addPasswordNumber('7')">7</button>
+                <button class="keypad-button" onclick="addPasswordNumber('8')">8</button>
+                <button class="keypad-button" onclick="addPasswordNumber('9')">9</button>
+                <button class="keypad-button red-button" onclick="clearPassword()">очистить</button>
+                <button class="keypad-button" onclick="addPasswordNumber('0')">0</button>
+                <button class="keypad-button red-button" onclick="deleteLastPassword()">удалить</button>
+            </div>
+            
+            <button class="action-button green-button" onclick="checkPassword()">вход</button>
+            <button class="action-button" onclick="showUserSelect()">назад</button>
+            
+            <div class="info-text" id="loginError" style="color:red; display:none;">неверный пароль!</div>
+        </div>
+    </div>
+
+    <!-- ГЛАВНЫЙ ЭКРАН ЕЛЕНЫ -->
     <div class="screen" id="mainScreen">
-        <div class="status-bar">Кассир: Елена | Бонусная система "ПЕРЕЦ"</div>
+        <div class="status-bar">кассир: Елена | бонусная система "перец"</div>
         
         <button class="main-button" onclick="startBarcodeScan()">
-            [F2] СКАНИРОВАТЬ ШТРИХКОД
+            сканировать штрихкод
         </button>
         
         <button class="main-button" onclick="showManualInput()">
-            [F3] РУЧНОЙ ВВОД ШТРИХКОДА
+            ручной ввод штрихкода
+        </button>
+        
+        <button class="main-button" onclick="showScanHistory()">
+            история сканирования
         </button>
         
         <button class="main-button red-button" onclick="logout()">
-            [ESC] ВЫХОД
+            выход
         </button>
     </div>
 
     <!-- ЭКРАН РУЧНОГО ВВОДА ШТРИХКОДА -->
     <div class="screen" id="manualInputScreen">
-        <div class="status-bar">Кассир: Елена | Ручной ввод штрихкода</div>
+        <div class="status-bar">кассир: Елена | ручной ввод штрихкода</div>
         
-        <input type="text" class="input-field" id="barcodeInput" placeholder="Введите 12 цифр штрихкода" maxlength="12" onkeypress="return handleBarcodeInput(event)">
-        <div class="info-text">Нажмите Enter для поиска или введите 12 цифр</div>
+        <div class="password-display" id="barcodeDisplay"></div>
+        <input type="hidden" id="barcodeInput">
         
-        <div class="button-row">
-            <button class="number-button" onclick="addNumber('1')">1</button>
-            <button class="number-button" onclick="addNumber('2')">2</button>
-            <button class="number-button" onclick="addNumber('3')">3</button>
+        <div class="keypad">
+            <button class="keypad-button" onclick="addBarcodeNumber('1')">1</button>
+            <button class="keypad-button" onclick="addBarcodeNumber('2')">2</button>
+            <button class="keypad-button" onclick="addBarcodeNumber('3')">3</button>
+            <button class="keypad-button" onclick="addBarcodeNumber('4')">4</button>
+            <button class="keypad-button" onclick="addBarcodeNumber('5')">5</button>
+            <button class="keypad-button" onclick="addBarcodeNumber('6')">6</button>
+            <button class="keypad-button" onclick="addBarcodeNumber('7')">7</button>
+            <button class="keypad-button" onclick="addBarcodeNumber('8')">8</button>
+            <button class="keypad-button" onclick="addBarcodeNumber('9')">9</button>
+            <button class="keypad-button red-button" onclick="clearBarcode()">очистить</button>
+            <button class="keypad-button" onclick="addBarcodeNumber('0')">0</button>
+            <button class="keypad-button red-button" onclick="deleteLastBarcode()">удалить</button>
         </div>
         
-        <div class="button-row">
-            <button class="number-button" onclick="addNumber('4')">4</button>
-            <button class="number-button" onclick="addNumber('5')">5</button>
-            <button class="number-button" onclick="addNumber('6')">6</button>
-        </div>
-        
-        <div class="button-row">
-            <button class="number-button" onclick="addNumber('7')">7</button>
-            <button class="number-button" onclick="addNumber('8')">8</button>
-            <button class="number-button" onclick="addNumber('9')">9</button>
-        </div>
-        
-        <div class="button-row">
-            <button class="number-button red-button" onclick="clearInput()">ОЧИСТИТЬ</button>
-            <button class="number-button" onclick="addNumber('0')">0</button>
-            <button class="number-button red-button" onclick="deleteLast()">УДАЛИТЬ</button>
-        </div>
-        
-        <button class="action-button green-button" onclick="findUserByBarcode()">[ENTER] НАЙТИ КЛИЕНТА</button>
-        <button class="action-button" onclick="showMainScreen()">[ESC] НАЗАД</button>
+        <button class="action-button green-button" onclick="findUserByBarcode()">найти клиента</button>
+        <button class="action-button" onclick="showMainScreen()">назад</button>
     </div>
 
-    <!-- ЭКРАН ИНФОРМАЦИИ О КЛИЕНТЕ И НАЧИСЛЕНИЯ -->
+    <!-- ЭКРАН ИНФОРМАЦИИ О КЛИЕНТЕ -->
     <div class="screen" id="userInfoScreen">
-        <div class="status-bar">Кассир: Елена | Начисление бонусов</div>
+        <div class="status-bar">кассир: Елена | начисление бонусов</div>
         
         <div class="user-info">
-            <div>Клиент: <span id="userName">-</span></div>
-            <div class="balance-display">Баланс: <span id="userBalance">0</span> бонусов</div>
-            <div>Штрихкод: <span id="userBarcode">-</span></div>
+            <div>клиент: <span id="userName">-</span></div>
+            <div class="balance-display">баланс: <span id="userBalance">0</span> бонусов</div>
+            <div>штрихкод: <span id="userBarcode">-</span></div>
         </div>
 
-        <!-- КАЛЬКУЛЯТОР СУММЫ ПОКУПКИ -->
         <div class="calculator-display">
-            <div>Сумма покупки (руб):</div>
-            <input type="text" class="input-field" id="purchaseAmount" placeholder="0" oninput="updateBonusCalculation()">
+            <div>сумма покупки (руб):</div>
+            <div class="password-display" id="purchaseDisplay">0</div>
+            <input type="hidden" id="purchaseAmount" value="0">
+            
+            <div class="keypad">
+                <button class="keypad-button" onclick="addPurchaseNumber('1')">1</button>
+                <button class="keypad-button" onclick="addPurchaseNumber('2')">2</button>
+                <button class="keypad-button" onclick="addPurchaseNumber('3')">3</button>
+                <button class="keypad-button" onclick="addPurchaseNumber('4')">4</button>
+                <button class="keypad-button" onclick="addPurchaseNumber('5')">5</button>
+                <button class="keypad-button" onclick="addPurchaseNumber('6')">6</button>
+                <button class="keypad-button" onclick="addPurchaseNumber('7')">7</button>
+                <button class="keypad-button" onclick="addPurchaseNumber('8')">8</button>
+                <button class="keypad-button" onclick="addPurchaseNumber('9')">9</button>
+                <button class="keypad-button red-button" onclick="clearPurchase()">очистить</button>
+                <button class="keypad-button" onclick="addPurchaseNumber('0')">0</button>
+                <button class="keypad-button" onclick="addPurchaseNumber('.')">.</button>
+            </div>
             
             <div class="bonus-result">
-                Бонусов к начислению: <span id="bonusCalculation">0</span>
+                бонусов к начислению: <span id="bonusCalculation">0</span>
             </div>
         </div>
 
-        <!-- ПРЯМОЕ НАЧИСЛЕНИЕ БОНУСОВ -->
         <div class="calculator-display">
-            <div>Прямое начисление бонусов:</div>
-            <input type="text" class="input-field" id="directBonusInput" placeholder="0" value="0">
+            <div>прямое начисление бонусов:</div>
+            <div class="password-display" id="directBonusDisplay">0</div>
+            <input type="hidden" id="directBonusInput" value="0">
             
             <div class="button-row">
                 <button class="number-button" onclick="addDirectBonus('10')">+10</button>
@@ -289,30 +390,121 @@
             </div>
         </div>
 
-        <button class="action-button green-button" onclick="addBonusesToUser()">[F10] НАЧИСЛИТЬ БОНУСЫ</button>
-        <button class="action-button" onclick="showMainScreen()">[ESC] НОВЫЙ КЛИЕНТ</button>
+        <button class="action-button green-button" onclick="addBonusesToUser()">начислить бонусы</button>
+        <button class="action-button" onclick="showMainScreen()">новый клиент</button>
+    </div>
+
+    <!-- ЭКРАН ИСТОРИИ СКАНИРОВАНИЯ -->
+    <div class="screen" id="historyScreen">
+        <div class="status-bar">история сканирования</div>
+        
+        <div class="developer-section">
+            <div class="info-text">последние операции:</div>
+            <div class="history-list" id="scanHistoryList">
+                <!-- История будет загружена здесь -->
+            </div>
+        </div>
+        
+        <button class="action-button" onclick="clearHistory()">очистить историю</button>
+        <button class="action-button" onclick="showMainScreen()">назад</button>
+    </div>
+
+    <!-- ЭКРАН РАЗРАБОТЧИКА -->
+    <div class="screen" id="developerScreen">
+        <div class="status-bar">developer mode | бонусная система "перец"</div>
+        
+        <div class="developer-section">
+            <div class="info-text">история сканирования:</div>
+            <div class="history-list" id="devHistoryList">
+                <!-- История будет загружена здесь -->
+            </div>
+            <button class="action-button" onclick="clearHistory()">очистить историю</button>
+        </div>
+        
+        <div class="developer-section">
+            <div class="info-text">база данных пользователей:</div>
+            <div class="history-list" id="userDatabaseList">
+                <!-- База данных будет загружена здесь -->
+            </div>
+        </div>
+        
+        <div class="developer-section">
+            <div class="info-text">настройки системы:</div>
+            <button class="main-button" onclick="resetSystem()">сброс системы</button>
+            <button class="main-button" onclick="exportData()">экспорт данных</button>
+            <button class="main-button red-button" onclick="deleteAllData()">удалить все данные</button>
+        </div>
+        
+        <button class="action-button" onclick="logout()">выход</button>
     </div>
 
     <script>
         let currentUser = null;
-        let barcodeBuffer = '';
-        let barcodeTimeout = null;
+        let currentUserName = '';
+        let scanHistory = JSON.parse(localStorage.getItem('scanHistory')) || [];
         
-        // Аутентификация
-        function checkLogin() {
-            const code = document.getElementById('loginCode').value;
-            if (code === '5901') {
-                showScreen('mainScreen');
-            } else {
-                document.getElementById('loginError').style.display = 'block';
+        // Демо-база данных пользователей
+        const userDatabase = {
+            "123456789012": { username: "Иванов Петр", balance: 150 },
+            "987654321098": { username: "Сидорова Мария", balance: 75 },
+            "111222333444": { username: "Петров Алексей", balance: 200 },
+            "555666777888": { username: "Козлова Анна", balance: 300 },
+            "999888777666": { username: "Смирнов Дмитрий", balance: 125 }
+        };
+        
+        // Управление пользователями
+        function selectUser(user) {
+            currentUserName = user;
+            document.getElementById('currentUser').textContent = user;
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('passwordDisplay').textContent = '*';
+            document.getElementById('loginError').style.display = 'none';
+            showScreen('loginScreen');
+        }
+        
+        function showUserSelect() {
+            showScreen('userSelectScreen');
+        }
+        
+        function showUserManager() {
+            alert('менеджер пользователей в разработке');
+        }
+        
+        // Управление паролем
+        function addPasswordNumber(num) {
+            const input = document.getElementById('passwordInput');
+            if (input.value.length < 8) {
+                input.value += num;
+                document.getElementById('passwordDisplay').textContent = '*'.repeat(input.value.length);
             }
         }
         
-        function logout() {
-            currentUser = null;
-            document.getElementById('loginCode').value = '';
-            document.getElementById('loginError').style.display = 'none';
-            showScreen('loginScreen');
+        function clearPassword() {
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('passwordDisplay').textContent = '*';
+        }
+        
+        function deleteLastPassword() {
+            const input = document.getElementById('passwordInput');
+            input.value = input.value.slice(0, -1);
+            document.getElementById('passwordDisplay').textContent = '*'.repeat(input.value.length);
+        }
+        
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            let isValid = false;
+            
+            if (currentUserName === 'Елена' && password === '5901') {
+                isValid = true;
+                showScreen('mainScreen');
+            } else if (currentUserName === 'developer' && password === '42385902') {
+                isValid = true;
+                showDeveloperScreen();
+            }
+            
+            if (!isValid) {
+                document.getElementById('loginError').style.display = 'block';
+            }
         }
         
         // Переключение экранов
@@ -321,10 +513,6 @@
                 screen.classList.remove('active');
             });
             document.getElementById(screenId).classList.add('active');
-            
-            // Сброс буфера штрихкода при смене экрана
-            barcodeBuffer = '';
-            clearTimeout(barcodeTimeout);
         }
         
         function showMainScreen() {
@@ -332,90 +520,70 @@
             showScreen('mainScreen');
         }
         
-        function showManualInput() {
-            showScreen('manualInputScreen');
-            document.getElementById('barcodeInput').value = '';
-            document.getElementById('barcodeInput').focus();
+        function logout() {
+            currentUser = null;
+            currentUserName = '';
+            showScreen('userSelectScreen');
         }
         
-        // РАБОТА СО СКАНЕРОМ ШТРИХКОДА
+        // Ручной ввод штрихкода
         function startBarcodeScan() {
             showScreen('manualInputScreen');
-            document.getElementById('barcodeInput').value = '';
-            document.getElementById('barcodeInput').focus();
-            document.getElementById('barcodeInput').placeholder = 'Поднесите штрихкод к сканеру...';
+            clearBarcode();
         }
         
-        function handleBarcodeInput(event) {
-            // Если нажат Enter - обрабатываем как завершение ввода
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                findUserByBarcode();
-                return false;
-            }
-            
-            // Для сканера - автоматический поиск при вводе 12 цифр
-            if (event.key >= '0' && event.key <= '9') {
-                barcodeBuffer += event.key;
-                clearTimeout(barcodeTimeout);
-                
-                barcodeTimeout = setTimeout(() => {
-                    if (barcodeBuffer.length === 12) {
-                        document.getElementById('barcodeInput').value = barcodeBuffer;
-                        findUserByBarcode();
-                    }
-                    barcodeBuffer = '';
-                }, 100);
-            }
-            
-            return true;
+        function showManualInput() {
+            showScreen('manualInputScreen');
+            clearBarcode();
         }
         
-        // Управление вводом штрихкода
-        function addNumber(number) {
+        function addBarcodeNumber(num) {
             const input = document.getElementById('barcodeInput');
             if (input.value.length < 12) {
-                input.value += number;
+                input.value += num;
+                document.getElementById('barcodeDisplay').textContent = input.value;
             }
         }
         
-        function clearInput() {
+        function clearBarcode() {
             document.getElementById('barcodeInput').value = '';
-            barcodeBuffer = '';
+            document.getElementById('barcodeDisplay').textContent = '';
         }
         
-        function deleteLast() {
+        function deleteLastBarcode() {
             const input = document.getElementById('barcodeInput');
             input.value = input.value.slice(0, -1);
+            document.getElementById('barcodeDisplay').textContent = input.value;
         }
         
         // Поиск пользователя по штрихкоду
-        async function findUserByBarcode() {
+        function findUserByBarcode() {
             const barcode = document.getElementById('barcodeInput').value;
             
             if (barcode.length !== 12) {
-                alert('ОШИБКА: Штрихкод должен содержать 12 цифр!');
+                alert('ошибка: штрихкод должен содержать 12 цифр!');
                 return;
             }
             
-            // Демо-данные пользователей
-            const demoUsers = {
-                "123456789012": { username: "Иванов Петр", balance: 150 },
-                "987654321098": { username: "Сидорова Мария", balance: 75 },
-                "111222333444": { username: "Петров Алексей", balance: 200 },
-                "555666777888": { username: "Козлова Анна", balance: 300 }
+            // Добавляем в историю
+            const scanRecord = {
+                barcode: barcode,
+                timestamp: new Date().toLocaleString(),
+                user: currentUserName
             };
+            scanHistory.unshift(scanRecord);
+            localStorage.setItem('scanHistory', JSON.stringify(scanHistory));
             
-            if (demoUsers[barcode]) {
+            if (userDatabase[barcode]) {
                 currentUser = {
                     barcode: barcode,
-                    username: demoUsers[barcode].username,
-                    balance: demoUsers[barcode].balance
+                    username: userDatabase[barcode].username,
+                    balance: userDatabase[barcode].balance
                 };
                 
                 showUserInfoScreen();
             } else {
-                alert('Клиент с таким штрихкодом не найден в системе!');
+                alert('клиент с таким штрихкодом не найден в системе!');
             }
         }
         
@@ -425,17 +593,36 @@
             document.getElementById('userBalance').textContent = currentUser.balance;
             document.getElementById('userBarcode').textContent = currentUser.barcode;
             
-            document.getElementById('purchaseAmount').value = '';
-            document.getElementById('directBonusInput').value = '0';
+            clearPurchase();
+            clearDirectBonus();
             updateBonusCalculation();
             
             showScreen('userInfoScreen');
         }
         
-        // Калькулятор бонусов
+        // Управление суммой покупки
+        function addPurchaseNumber(num) {
+            const input = document.getElementById('purchaseAmount');
+            let value = input.value;
+            
+            if (value === '0') value = '';
+            if (num === '.' && value.includes('.')) return;
+            
+            value += num;
+            input.value = value;
+            document.getElementById('purchaseDisplay').textContent = value;
+            updateBonusCalculation();
+        }
+        
+        function clearPurchase() {
+            document.getElementById('purchaseAmount').value = '0';
+            document.getElementById('purchaseDisplay').textContent = '0';
+            updateBonusCalculation();
+        }
+        
         function updateBonusCalculation() {
             const amount = parseFloat(document.getElementById('purchaseAmount').value) || 0;
-            const bonuses = Math.floor(amount / 0.5); // 1 бонус = 0.5 руб
+            const bonuses = Math.floor(amount / 0.5);
             document.getElementById('bonusCalculation').textContent = bonuses;
         }
         
@@ -443,11 +630,18 @@
         function addDirectBonus(amount) {
             const input = document.getElementById('directBonusInput');
             const current = parseInt(input.value) || 0;
-            input.value = current + parseInt(amount);
+            const newValue = current + parseInt(amount);
+            input.value = newValue;
+            document.getElementById('directBonusDisplay').textContent = newValue;
+        }
+        
+        function clearDirectBonus() {
+            document.getElementById('directBonusInput').value = '0';
+            document.getElementById('directBonusDisplay').textContent = '0';
         }
         
         // Начисление бонусов
-        async function addBonusesToUser() {
+        function addBonusesToUser() {
             const purchaseAmount = parseFloat(document.getElementById('purchaseAmount').value) || 0;
             const directBonus = parseInt(document.getElementById('directBonusInput').value) || 0;
             
@@ -458,76 +652,112 @@
             }
             
             if (bonusesToAdd <= 0) {
-                alert('ОШИБКА: Введите количество бонусов для начисления!');
+                alert('ошибка: введите количество бонусов для начисления!');
                 return;
             }
             
-            // Обновляем баланс (в реальной системе здесь будет вызов API)
             currentUser.balance += bonusesToAdd;
+            userDatabase[currentUser.barcode].balance = currentUser.balance;
             
-            alert(`Начислено бонусов: ${bonusesToAdd}\nНовый баланс: ${currentUser.balance}`);
+            alert(`начислено бонусов: ${bonusesToAdd}\nновый баланс: ${currentUser.balance}`);
             
-            // Обновляем отображение
             document.getElementById('userBalance').textContent = currentUser.balance;
-            
-            // Очищаем поля
-            document.getElementById('purchaseAmount').value = '';
-            document.getElementById('directBonusInput').value = '0';
-            updateBonusCalculation();
+            clearPurchase();
+            clearDirectBonus();
         }
         
-        // Обработка горячих клавиш
-        document.addEventListener('keydown', function(event) {
-            // ESC - назад/выход
-            if (event.key === 'Escape') {
-                if (document.getElementById('mainScreen').classList.contains('active')) {
-                    logout();
-                } else if (document.getElementById('manualInputScreen').classList.contains('active') || 
-                          document.getElementById('userInfoScreen').classList.contains('active')) {
-                    showMainScreen();
-                }
-            }
-            
-            // F2 - сканирование штрихкода
-            if (event.key === 'F2') {
-                if (document.getElementById('mainScreen').classList.contains('active')) {
-                    startBarcodeScan();
-                }
-            }
-            
-            // F3 - ручной ввод
-            if (event.key === 'F3') {
-                if (document.getElementById('mainScreen').classList.contains('active')) {
-                    showManualInput();
-                }
-            }
-            
-            // F10 - начислить бонусы
-            if (event.key === 'F10') {
-                if (document.getElementById('userInfoScreen').classList.contains('active')) {
-                    addBonusesToUser();
-                }
-            }
-            
-            // Enter в поле ввода штрихкода
-            if (event.key === 'Enter') {
-                if (document.getElementById('manualInputScreen').classList.contains('active')) {
-                    findUserByBarcode();
-                }
-            }
-            
-            // Цифры для ручного ввода
-            if (event.key >= '0' && event.key <= '9') {
-                if (document.getElementById('manualInputScreen').classList.contains('active')) {
-                    addNumber(event.key);
-                }
-            }
-        });
+        // История сканирования
+        function showScanHistory() {
+            showScreen('historyScreen');
+            loadScanHistory();
+        }
         
-        // Фокус на поле ввода при открытии экрана ручного ввода
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('loginCode').focus();
-        });
+        function loadScanHistory() {
+            const historyList = document.getElementById('scanHistoryList');
+            historyList.innerHTML = '';
+            
+            scanHistory.slice(0, 20).forEach(record => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.textContent = `${record.timestamp} - ${record.barcode} (${record.user})`;
+                historyList.appendChild(item);
+            });
+        }
+        
+        function clearHistory() {
+            if (confirm('очистить историю сканирования?')) {
+                scanHistory = [];
+                localStorage.setItem('scanHistory', JSON.stringify(scanHistory));
+                loadScanHistory();
+                if (document.getElementById('devHistoryList')) {
+                    loadDevHistory();
+                }
+            }
+        }
+        
+        // Экран разработчика
+        function showDeveloperScreen() {
+            showScreen('developerScreen');
+            loadDevHistory();
+            loadUserDatabase();
+        }
+        
+        function loadDevHistory() {
+            const historyList = document.getElementById('devHistoryList');
+            historyList.innerHTML = '';
+            
+            scanHistory.forEach(record => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.textContent = `${record.timestamp} - ${record.barcode} (${record.user})`;
+                historyList.appendChild(item);
+            });
+        }
+        
+        function loadUserDatabase() {
+            const dbList = document.getElementById('userDatabaseList');
+            dbList.innerHTML = '';
+            
+            Object.keys(userDatabase).forEach(barcode => {
+                const user = userDatabase[barcode];
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.textContent = `${barcode} - ${user.username} - ${user.balance} бонусов`;
+                dbList.appendChild(item);
+            });
+        }
+        
+        function resetSystem() {
+            if (confirm('сбросить систему?')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+        
+        function exportData() {
+            const data = {
+                users: userDatabase,
+                history: scanHistory
+            };
+            alert('данные экспортированы в консоль');
+            console.log('Export Data:', data);
+        }
+        
+        function deleteAllData() {
+            if (confirm('удалить ВСЕ данные? это действие нельзя отменить!')) {
+                localStorage.clear();
+                Object.keys(userDatabase).forEach(key => {
+                    userDatabase[key].balance = 0;
+                });
+                scanHistory = [];
+                alert('все данные удалены');
+                loadUserDatabase();
+                loadDevHistory();
+            }
+        }
+        
+        // Инициализация
+        showScreen('userSelectScreen');
     </script>
 </body>
 </html>
