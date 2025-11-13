@@ -1,0 +1,12 @@
+{
+  "users": {
+    "user123": {
+      "password": "hashed_password",
+      "balance": 150,
+      "barcode": "123456789012"
+    }
+  },
+  "admins": {
+    "admin1": "hashed_password"
+  }
+}
