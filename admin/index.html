@@ -236,15 +236,28 @@
             background: #1d2733;
             border: 2px solid #293a53;
             margin: 10px 0;
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
         }
         
         .history-item {
             padding: 10px;
             border-bottom: 1px solid #293a53;
-            font-size: 12px;
+            font-size: 11px;
             color: #fff;
+            line-height: 1.4;
+        }
+        
+        .history-header {
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        
+        .history-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            font-size: 10px;
         }
         
         .developer-section {
@@ -296,6 +309,7 @@
             position: absolute;
             left: -9999px;
             opacity: 0;
+            height: 0;
         }
     </style>
 </head>
@@ -375,7 +389,7 @@
 
     <!-- ЭКРАН РУЧНОГО ВВОДА ШТРИХКОДА -->
     <div class="screen" id="manualInputScreen">
-        <div class="status-bar">кассир: <span id="manualInputUser">Елена</span> | ручной ввод штрихкода</div>
+        <div class="status-bar">кассир: <span id="manualInputUser">Еlena</span> | ручной ввод штрихкода</div>
         
         <div class="password-display" id="barcodeDisplay"></div>
         <input type="hidden" id="barcodeInput">
@@ -524,8 +538,7 @@
         let currentUserName = 'Елена';
         let scanHistory = JSON.parse(localStorage.getItem('scanHistory')) || [];
         let countdownInterval = null;
-        let keyboardBuffer = '';
-        let keyboardTimeout = null;
+        let lastAddedBonuses = 0;
         
         // Демо-база данных пользователей
         const userDatabase = {
@@ -608,11 +621,10 @@
             
             // Фокусируем скрытое поле для ввода с клавиатуры на нужных экранах
             const keyboardInput = document.getElementById('keyboardInput');
-            if (screenId === 'manualInputScreen' || screenId === 'userInfoScreen') {
+            if (screenId === 'manualInputScreen') {
                 setTimeout(() => {
                     keyboardInput.focus();
                     keyboardInput.value = '';
-                    keyboardBuffer = '';
                 }, 100);
             } else {
                 keyboardInput.blur();
@@ -662,7 +674,6 @@
         function clearBarcode() {
             document.getElementById('barcodeInput').value = '';
             document.getElementById('barcodeDisplay').textContent = '';
-            keyboardBuffer = '';
         }
         
         function deleteLastBarcode() {
@@ -675,50 +686,44 @@
         function setupKeyboardListener() {
             const keyboardInput = document.getElementById('keyboardInput');
             
-            keyboardInput.addEventListener('input', function(e) {
-                const value = this.value;
-                
+            keyboardInput.addEventListener('keydown', function(e) {
                 // Если на экране ручного ввода штрихкода
                 if (document.getElementById('manualInputScreen').classList.contains('active')) {
-                    // Обрабатываем только цифры
-                    const digits = value.replace(/\D/g, '');
-                    
-                    if (digits.length > 0) {
-                        document.getElementById('barcodeInput').value = digits.slice(0, 12);
-                        document.getElementById('barcodeDisplay').textContent = digits.slice(0, 12);
+                    // Разрешаем только цифры и управляющие клавиши
+                    if ((e.key >= '0' && e.key <= '9') || 
+                        e.key === 'Backspace' || 
+                        e.key === 'Delete' || 
+                        e.key === 'Enter' || 
+                        e.key === 'Escape') {
                         
-                        // Автоматический поиск при вводе 12 цифр
-                        if (digits.length >= 12) {
-                            setTimeout(() => {
-                                findUserByBarcode();
-                            }, 100);
+                        // Enter - поиск клиента
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            findUserByBarcode();
+                            return;
                         }
-                    }
-                    
-                    this.value = '';
-                }
-                
-                // Если на экране информации о клиенте - обрабатываем ввод для суммы покупки и бонусов
-                if (document.getElementById('userInfoScreen').classList.contains('active')) {
-                    // Здесь можно добавить обработку для других полей ввода если нужно
-                    this.value = '';
-                }
-            });
-            
-            // Обработка специальных клавиш
-            keyboardInput.addEventListener('keydown', function(e) {
-                // Enter - поиск клиента на экране ручного ввода
-                if (e.key === 'Enter' && document.getElementById('manualInputScreen').classList.contains('active')) {
-                    e.preventDefault();
-                    findUserByBarcode();
-                }
-                
-                // Escape - назад
-                if (e.key === 'Escape') {
-                    e.preventDefault();
-                    if (document.getElementById('manualInputScreen').classList.contains('active') || 
-                        document.getElementById('userInfoScreen').classList.contains('active')) {
-                        showMainScreen();
+                        
+                        // Escape - назад
+                        if (e.key === 'Escape') {
+                            e.preventDefault();
+                            showMainScreen();
+                            return;
+                        }
+                        
+                        // Backspace - удалить последнюю цифру
+                        if (e.key === 'Backspace') {
+                            e.preventDefault();
+                            deleteLastBarcode();
+                            return;
+                        }
+                        
+                        // Цифры - добавляем ввод
+                        if (e.key >= '0' && e.key <= '9') {
+                            e.preventDefault();
+                            addBarcodeNumber(e.key);
+                        }
+                    } else {
+                        e.preventDefault();
                     }
                 }
             });
@@ -739,11 +744,18 @@
                 return;
             }
             
-            // Добавляем в историю
+            // Добавляем запись в историю (только сканирование)
             const scanRecord = {
+                type: 'scan',
                 barcode: barcode,
-                timestamp: new Date().toLocaleString(),
-                user: currentUserName
+                clientName: userDatabase[barcode] ? userDatabase[barcode].username : 'Неизвестный клиент',
+                timestamp: new Date().toLocaleString('ru-RU'),
+                date: new Date().toLocaleDateString('ru-RU'),
+                time: new Date().toLocaleTimeString('ru-RU'),
+                user: currentUserName,
+                oldBalance: userDatabase[barcode] ? userDatabase[barcode].balance : 0,
+                addedBonuses: 0,
+                newBalance: userDatabase[barcode] ? userDatabase[barcode].balance : 0
             };
             scanHistory.unshift(scanRecord);
             localStorage.setItem('scanHistory', JSON.stringify(scanHistory));
@@ -844,8 +856,26 @@
                 return;
             }
             
+            const oldBalance = currentUser.balance;
             currentUser.balance += bonusesToAdd;
             userDatabase[currentUser.barcode].balance = currentUser.balance;
+            lastAddedBonuses = bonusesToAdd;
+            
+            // Добавляем запись в историю (начисление бонусов)
+            const bonusRecord = {
+                type: 'bonus_add',
+                barcode: currentUser.barcode,
+                clientName: currentUser.username,
+                timestamp: new Date().toLocaleString('ru-RU'),
+                date: new Date().toLocaleDateString('ru-RU'),
+                time: new Date().toLocaleTimeString('ru-RU'),
+                user: currentUserName,
+                oldBalance: oldBalance,
+                addedBonuses: bonusesToAdd,
+                newBalance: currentUser.balance
+            };
+            scanHistory.unshift(bonusRecord);
+            localStorage.setItem('scanHistory', JSON.stringify(scanHistory));
             
             // Показываем экран обратного отсчета
             startCountdown();
@@ -876,16 +906,14 @@
             }
             
             // Откатываем начисление бонусов
-            const purchaseAmount = parseFloat(document.getElementById('purchaseAmount').value) || 0;
-            const directBonus = parseInt(document.getElementById('directBonusInput').value) || 0;
-            
-            let bonusesToAdd = directBonus;
-            if (purchaseAmount > 0) {
-                bonusesToAdd += Math.floor(purchaseAmount * 10);
-            }
-            
-            currentUser.balance -= bonusesToAdd;
+            currentUser.balance -= lastAddedBonuses;
             userDatabase[currentUser.barcode].balance = currentUser.balance;
+            
+            // Удаляем последнюю запись из истории (начисление бонусов)
+            scanHistory = scanHistory.filter(record => 
+                !(record.type === 'bonus_add' && record.barcode === currentUser.barcode && record.addedBonuses === lastAddedBonuses)
+            );
+            localStorage.setItem('scanHistory', JSON.stringify(scanHistory));
             
             document.getElementById('userBalance').textContent = currentUser.balance;
             showUserInfoScreen();
@@ -904,7 +932,35 @@
             scanHistory.slice(0, 20).forEach(record => {
                 const item = document.createElement('div');
                 item.className = 'history-item';
-                item.textContent = `${record.timestamp} - ${record.barcode} (${record.user})`;
+                
+                let content = '';
+                if (record.type === 'scan') {
+                    content = `
+                        <div class="history-header">🔍 Сканирование - ${record.clientName}</div>
+                        <div class="history-details">
+                            <div>📅 ${record.date}</div>
+                            <div>🕒 ${record.time}</div>
+                            <div>👤 ${record.user}</div>
+                            <div>📋 ШК: ${record.barcode}</div>
+                            <div>💰 Баланс: ${record.oldBalance} бонусов</div>
+                        </div>
+                    `;
+                } else if (record.type === 'bonus_add') {
+                    content = `
+                        <div class="history-header">🎁 Начисление бонусов - ${record.clientName}</div>
+                        <div class="history-details">
+                            <div>📅 ${record.date}</div>
+                            <div>🕒 ${record.time}</div>
+                            <div>👤 ${record.user}</div>
+                            <div>📋 ШК: ${record.barcode}</div>
+                            <div>💰 Было: ${record.oldBalance} бонусов</div>
+                            <div>➕ Начислено: ${record.addedBonuses} бонусов</div>
+                            <div>💰 Стало: ${record.newBalance} бонусов</div>
+                        </div>
+                    `;
+                }
+                
+                item.innerHTML = content;
                 historyList.appendChild(item);
             });
         }
@@ -923,7 +979,35 @@
             scanHistory.forEach(record => {
                 const item = document.createElement('div');
                 item.className = 'history-item';
-                item.textContent = `${record.timestamp} - ${record.barcode} (${record.user})`;
+                
+                let content = '';
+                if (record.type === 'scan') {
+                    content = `
+                        <div class="history-header">🔍 Сканирование - ${record.clientName}</div>
+                        <div class="history-details">
+                            <div>📅 ${record.date}</div>
+                            <div>🕒 ${record.time}</div>
+                            <div>👤 ${record.user}</div>
+                            <div>📋 ШК: ${record.barcode}</div>
+                            <div>💰 Баланс: ${record.oldBalance} бонусов</div>
+                        </div>
+                    `;
+                } else if (record.type === 'bonus_add') {
+                    content = `
+                        <div class="history-header">🎁 Начисление бонусов - ${record.clientName}</div>
+                        <div class="history-details">
+                            <div>📅 ${record.date}</div>
+                            <div>🕒 ${record.time}</div>
+                            <div>👤 ${record.user}</div>
+                            <div>📋 ШК: ${record.barcode}</div>
+                            <div>💰 Было: ${record.oldBalance} бонусов</div>
+                            <div>➕ Начислено: ${record.addedBonuses} бонусов</div>
+                            <div>💰 Стало: ${record.newBalance} бонусов</div>
+                        </div>
+                    `;
+                }
+                
+                item.innerHTML = content;
                 historyList.appendChild(item);
             });
         }
