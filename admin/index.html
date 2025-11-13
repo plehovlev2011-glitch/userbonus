@@ -4,17 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админ - Бонусная система ПЕРЕЦ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Ubuntu Mono', monospace;
         }
         
         body {
-            background: #1d2733;
-            color: #fff;
+            background: #ffffff;
+            color: #333;
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -24,8 +25,8 @@
             display: none;
             flex: 1;
             flex-direction: column;
-            padding: 10px;
-            background: #1d2733;
+            padding: 20px;
+            background: #ffffff;
         }
         
         .active {
@@ -33,238 +34,305 @@
         }
         
         .header {
-            background: #293a53;
+            background: #d32f2f;
             color: #fff;
-            padding: 15px;
+            padding: 20px;
             text-align: center;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
-            margin-bottom: 10px;
-            border: 2px solid #000;
+            margin-bottom: 20px;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
         .login-form {
-            background: #1d2733;
-            padding: 20px;
-            border: 2px solid #293a53;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 25px;
             margin: 20px auto;
             width: 90%;
-            max-width: 400px;
+            max-width: 450px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         
         .user-list {
-            margin: 10px 0;
+            margin: 15px 0;
         }
         
         .user-button {
             width: 100%;
-            padding: 15px;
-            font-size: 16px;
-            background: #293a53;
+            padding: 20px;
+            font-size: 18px;
+            background: #d32f2f;
             color: #fff;
-            border: 2px solid #000;
+            border: none;
+            border-radius: 25px;
             cursor: pointer;
-            margin: 5px 0;
+            margin: 10px 0;
             text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: all 0.2s;
         }
         
         .user-button:active {
-            background: #3a4b63;
+            background: #b71c1c;
+            transform: scale(0.98);
         }
         
         .password-input {
             width: 100%;
-            padding: 15px;
-            font-size: 18px;
-            margin: 10px 0;
-            border: 2px solid #293a53;
-            background: #1d2733;
-            color: #fff;
+            padding: 20px;
+            font-size: 20px;
+            margin: 15px 0;
+            border: 3px solid #d32f2f;
+            background: #fff;
+            color: #333;
             text-align: center;
+            border-radius: 25px;
+            font-weight: bold;
         }
         
         .password-display {
-            font-size: 24px;
-            letter-spacing: 5px;
+            font-size: 28px;
+            letter-spacing: 8px;
             text-align: center;
-            margin: 10px 0;
-            min-height: 40px;
-            color: #fff;
+            margin: 15px 0;
+            min-height: 50px;
+            color: #333;
+            font-weight: bold;
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 25px;
+            border: 3px solid #d32f2f;
         }
         
         .keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            margin: 10px 0;
+            gap: 12px;
+            margin: 20px 0;
         }
         
         .keypad-button {
-            padding: 20px;
-            font-size: 18px;
-            background: #293a53;
+            padding: 25px;
+            font-size: 22px;
+            background: #d32f2f;
             color: #fff;
-            border: 2px solid #000;
+            border: none;
+            border-radius: 25px;
             cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: all 0.2s;
         }
         
         .keypad-button:active {
-            background: #3a4b63;
+            background: #b71c1c;
+            transform: scale(0.95);
         }
         
         .action-button {
-            background: #293a53;
+            background: #d32f2f;
             color: #fff;
-            border: 2px solid #000;
-            padding: 15px;
-            font-size: 16px;
+            border: none;
+            padding: 20px;
+            font-size: 18px;
             cursor: pointer;
-            margin: 5px 0;
+            margin: 10px 0;
             width: 100%;
+            border-radius: 25px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: all 0.2s;
         }
         
         .action-button:active {
-            background: #3a4b63;
+            background: #b71c1c;
+            transform: scale(0.98);
         }
         
         .green-button {
-            background: #00aa00;
+            background: #388e3c;
+        }
+        
+        .green-button:active {
+            background: #2e7d32;
         }
         
         .red-button {
-            background: #aa0000;
+            background: #d32f2f;
+        }
+        
+        .red-button:active {
+            background: #b71c1c;
         }
         
         .status-bar {
-            background: #293a53;
+            background: #d32f2f;
             color: #fff;
-            padding: 8px;
-            font-size: 14px;
-            border: 1px solid #000;
-            margin-bottom: 10px;
+            padding: 15px;
+            font-size: 16px;
+            border: none;
+            margin-bottom: 20px;
+            border-radius: 25px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
         .main-button {
-            background: #293a53;
+            background: #d32f2f;
             color: #fff;
-            border: 2px solid #000;
-            padding: 20px;
-            font-size: 16px;
+            border: none;
+            padding: 25px;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            margin: 5px 0;
+            margin: 10px 0;
             text-align: left;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: all 0.2s;
         }
         
         .main-button:active {
-            background: #3a4b63;
+            background: #b71c1c;
+            transform: scale(0.98);
         }
         
         .input-field {
             width: 100%;
-            padding: 15px;
-            font-size: 16px;
-            border: 2px solid #293a53;
-            background: #1d2733;
-            color: #fff;
-            margin: 10px 0;
+            padding: 20px;
+            font-size: 18px;
+            border: 3px solid #d32f2f;
+            background: #fff;
+            color: #333;
+            margin: 15px 0;
+            border-radius: 25px;
+            font-weight: bold;
         }
         
         .button-row {
             display: flex;
-            gap: 5px;
-            margin: 5px 0;
+            gap: 12px;
+            margin: 12px 0;
         }
         
         .number-button {
             flex: 1;
-            background: #293a53;
+            background: #d32f2f;
             color: #fff;
-            border: 2px solid #000;
-            padding: 15px;
-            font-size: 16px;
+            border: none;
+            padding: 20px;
+            font-size: 18px;
             cursor: pointer;
+            border-radius: 25px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: all 0.2s;
         }
         
         .number-button:active {
-            background: #3a4b63;
+            background: #b71c1c;
+            transform: scale(0.95);
         }
         
         .user-info {
-            background: #293a53;
-            padding: 15px;
-            border: 2px solid #000;
-            margin: 10px 0;
-            font-size: 14px;
+            background: #f8f9fa;
+            padding: 20px;
+            border: 3px solid #d32f2f;
+            margin: 15px 0;
+            font-size: 16px;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
         .balance-display {
-            font-size: 18px;
-            color: #fff;
+            font-size: 20px;
+            color: #333;
             font-weight: bold;
-            margin: 10px 0;
-            background: #1d2733;
-            padding: 10px;
-            border: 1px solid #293a53;
+            margin: 15px 0;
+            background: #fff;
+            padding: 15px;
+            border: 3px solid #d32f2f;
+            border-radius: 25px;
+            text-align: center;
         }
         
         .calculator-display {
-            background: #293a53;
-            padding: 15px;
-            border: 2px solid #000;
-            margin: 10px 0;
+            background: #f8f9fa;
+            padding: 20px;
+            border: 3px solid #d32f2f;
+            margin: 15px 0;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
         .bonus-result {
-            font-size: 16px;
-            color: #fff;
+            font-size: 18px;
+            color: #333;
             font-weight: bold;
             text-align: center;
-            margin: 10px 0;
-            background: #1d2733;
-            padding: 10px;
-            border: 1px solid #293a53;
+            margin: 15px 0;
+            background: #fff;
+            padding: 15px;
+            border: 3px solid #388e3c;
+            border-radius: 25px;
         }
         
         .info-text {
-            font-size: 12px;
-            color: #fff;
-            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+            margin: 8px 0;
+            text-align: center;
         }
         
         .history-list {
-            background: #1d2733;
-            border: 2px solid #293a53;
-            margin: 10px 0;
+            background: #fff;
+            border: 3px solid #d32f2f;
+            margin: 15px 0;
             max-height: 400px;
             overflow-y: auto;
+            border-radius: 25px;
+            padding: 10px;
         }
         
         .history-item {
-            padding: 10px;
-            border-bottom: 1px solid #293a53;
-            font-size: 11px;
-            color: #fff;
-            line-height: 1.4;
+            padding: 15px;
+            border-bottom: 2px solid #e0e0e0;
+            font-size: 12px;
+            color: #333;
+            line-height: 1.5;
+            border-radius: 15px;
+            margin: 8px 0;
+            background: #f8f9fa;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
         }
         
         .history-header {
             font-weight: bold;
-            margin-bottom: 3px;
+            margin-bottom: 5px;
+            font-size: 13px;
         }
         
         .history-details {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 5px;
-            font-size: 10px;
+            gap: 8px;
+            font-size: 11px;
         }
         
         .developer-section {
-            background: #293a53;
-            padding: 15px;
-            border: 2px solid #000;
-            margin: 10px 0;
+            background: #f8f9fa;
+            padding: 20px;
+            border: 3px solid #d32f2f;
+            margin: 15px 0;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
         .special-image {
@@ -273,13 +341,16 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: #1d2733;
+            background: #fff;
+            padding: 20px;
         }
         
         .special-image img {
             max-width: 100%;
-            max-height: 80%;
+            max-height: 70%;
             object-fit: contain;
+            border-radius: 25px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
         }
         
         .countdown-screen {
@@ -288,21 +359,32 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: #1d2733;
+            background: #fff;
             text-align: center;
-            padding: 20px;
+            padding: 30px;
         }
         
         .countdown-timer {
-            font-size: 48px;
-            color: #00ff00;
+            font-size: 64px;
+            color: #388e3c;
             font-weight: bold;
-            margin: 20px 0;
+            margin: 25px 0;
+            background: #f1f8e9;
+            padding: 30px;
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
         }
         
         .countdown-text {
-            font-size: 24px;
-            margin: 20px 0;
+            font-size: 28px;
+            margin: 25px 0;
+            color: #333;
+            font-weight: bold;
         }
 
         .hidden-input {
@@ -310,6 +392,17 @@
             left: -9999px;
             opacity: 0;
             height: 0;
+        }
+
+        .keyboard-hint {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 20px;
+            margin: 10px 0;
+            text-align: center;
+            border: 2px solid #2196f3;
+            font-size: 13px;
+            color: #1976d2;
         }
     </style>
 </head>
@@ -319,11 +412,11 @@
 
     <!-- ЭКРАН ВВОДА ПАРОЛЯ -->
     <div class="screen active" id="loginScreen">
-        <div class="header">вход в систему</div>
+        <div class="header">ВХОД В СИСТЕМУ</div>
         
         <div class="login-form">
-            <div class="info-text">пользователь: <span id="currentUser">Елена</span></div>
-            <div class="info-text">введите пароль:</div>
+            <div class="info-text">Пользователь: <span id="currentUser">Елена</span></div>
+            <div class="info-text">Введите пароль:</div>
             
             <div class="password-display" id="passwordDisplay">*</div>
             <input type="hidden" id="passwordInput">
@@ -338,63 +431,65 @@
                 <button class="keypad-button" onclick="addPasswordNumber('7')">7</button>
                 <button class="keypad-button" onclick="addPasswordNumber('8')">8</button>
                 <button class="keypad-button" onclick="addPasswordNumber('9')">9</button>
-                <button class="keypad-button red-button" onclick="clearPassword()">очистить</button>
+                <button class="keypad-button red-button" onclick="clearPassword()">Очистить</button>
                 <button class="keypad-button" onclick="addPasswordNumber('0')">0</button>
-                <button class="keypad-button red-button" onclick="deleteLastPassword()">удалить</button>
+                <button class="keypad-button red-button" onclick="deleteLastPassword()">Удалить</button>
             </div>
             
-            <button class="action-button green-button" onclick="checkPassword()">вход</button>
-            <button class="action-button" onclick="showUserSelect()">другой юзер</button>
+            <button class="action-button green-button" onclick="checkPassword()">Вход</button>
+            <button class="action-button" onclick="showUserSelect()">Другой юзер</button>
             
-            <div class="info-text" id="loginError" style="color:#ff4444; display:none;">неверный пароль!</div>
+            <div class="info-text" id="loginError" style="color:#d32f2f; display:none;">Неверный пароль!</div>
         </div>
     </div>
 
     <!-- ЭКРАН ВЫБОРА ПОЛЬЗОВАТЕЛЯ -->
     <div class="screen" id="userSelectScreen">
-        <div class="header">бонусная система "перец"</div>
+        <div class="header">БОНУСНАЯ СИСТЕМА "ПЕРЕЦ"</div>
         
         <div class="login-form">
-            <div class="info-text">выберите пользователя:</div>
+            <div class="info-text">Выберите пользователя:</div>
             
             <div class="user-list">
                 <button class="user-button" onclick="selectUser('Елена')">Елена</button>
-                <button class="user-button" onclick="selectUser('developer')">developer</button>
+                <button class="user-button" onclick="selectUser('developer')">Developer</button>
             </div>
             
-            <button class="action-button" onclick="showLoginScreen()">назад</button>
+            <button class="action-button" onclick="showLoginScreen()">Назад</button>
         </div>
     </div>
 
     <!-- ГЛАВНЫЙ ЭКРАН ЕЛЕНЫ -->
     <div class="screen" id="mainScreen">
-        <div class="status-bar">кассир: <span id="currentUserName">Елена</span> | бонусная система "перец"</div>
+        <div class="status-bar">Кассир: <span id="currentUserName">Елена</span> | Бонусная система "ПЕРЕЦ"</div>
         
         <button class="main-button" onclick="startBarcodeScan()">
-            сканировать штрихкод
+            📷 Сканировать штрихкод
         </button>
         
         <button class="main-button" onclick="showManualInput()">
-            ручной ввод штрихкода
+            ⌨️ Ручной ввод штрихкода
         </button>
         
         <button class="main-button" onclick="showScanHistory()">
-            история сканирования
+            📊 История сканирования
         </button>
         
         <button class="main-button red-button" onclick="logout()">
-            выход
+            🚪 Выход
         </button>
     </div>
 
     <!-- ЭКРАН РУЧНОГО ВВОДА ШТРИХКОДА -->
     <div class="screen" id="manualInputScreen">
-        <div class="status-bar">кассир: <span id="manualInputUser">Еlena</span> | ручной ввод штрихкода</div>
+        <div class="status-bar">Кассир: <span id="manualInputUser">Елена</span> | Ручной ввод штрихкода</div>
         
         <div class="password-display" id="barcodeDisplay"></div>
         <input type="hidden" id="barcodeInput">
         
-        <div class="info-text">введите 12 цифр штрихкода с клавиатуры или используйте кнопки ниже</div>
+        <div class="keyboard-hint">
+            💡 Введите 12 цифр штрихкода с клавиатуры или используйте кнопки ниже
+        </div>
         
         <div class="keypad">
             <button class="keypad-button" onclick="addBarcodeNumber('1')">1</button>
@@ -406,27 +501,27 @@
             <button class="keypad-button" onclick="addBarcodeNumber('7')">7</button>
             <button class="keypad-button" onclick="addBarcodeNumber('8')">8</button>
             <button class="keypad-button" onclick="addBarcodeNumber('9')">9</button>
-            <button class="keypad-button red-button" onclick="clearBarcode()">очистить</button>
+            <button class="keypad-button red-button" onclick="clearBarcode()">Очистить</button>
             <button class="keypad-button" onclick="addBarcodeNumber('0')">0</button>
-            <button class="keypad-button red-button" onclick="deleteLastBarcode()">удалить</button>
+            <button class="keypad-button red-button" onclick="deleteLastBarcode()">Удалить</button>
         </div>
         
-        <button class="action-button green-button" onclick="findUserByBarcode()">найти клиента</button>
-        <button class="action-button" onclick="showMainScreen()">назад</button>
+        <button class="action-button green-button" onclick="findUserByBarcode()">🔍 Найти клиента</button>
+        <button class="action-button" onclick="showMainScreen()">↩ Назад</button>
     </div>
 
     <!-- ЭКРАН ИНФОРМАЦИИ О КЛИЕНТЕ -->
     <div class="screen" id="userInfoScreen">
-        <div class="status-bar">кассир: <span id="userInfoUser">Елена</span> | начисление бонусов</div>
+        <div class="status-bar">Кассир: <span id="userInfoUser">Елена</span> | Начисление бонусов</div>
         
         <div class="user-info">
-            <div>клиент: <span id="userName">-</span></div>
-            <div class="balance-display">баланс: <span id="userBalance">0</span> бонусов</div>
-            <div>штрихкод: <span id="userBarcode">-</span></div>
+            <div>👤 Клиент: <span id="userName">-</span></div>
+            <div class="balance-display">💰 Баланс: <span id="userBalance">0</span> бонусов</div>
+            <div>📋 Штрихкод: <span id="userBarcode">-</span></div>
         </div>
 
         <div class="calculator-display">
-            <div>сумма покупки (руб):</div>
+            <div>💳 Сумма покупки (руб):</div>
             <div class="password-display" id="purchaseDisplay">0</div>
             <input type="hidden" id="purchaseAmount" value="0">
             
@@ -440,18 +535,18 @@
                 <button class="keypad-button" onclick="addPurchaseNumber('7')">7</button>
                 <button class="keypad-button" onclick="addPurchaseNumber('8')">8</button>
                 <button class="keypad-button" onclick="addPurchaseNumber('9')">9</button>
-                <button class="keypad-button red-button" onclick="clearPurchase()">очистить</button>
+                <button class="keypad-button red-button" onclick="clearPurchase()">Очистить</button>
                 <button class="keypad-button" onclick="addPurchaseNumber('0')">0</button>
                 <button class="keypad-button" onclick="addPurchaseNumber('.')">.</button>
             </div>
             
             <div class="bonus-result">
-                бонусов к начислению: <span id="bonusCalculation">0</span>
+                🎁 Бонусов к начислению: <span id="bonusCalculation">0</span>
             </div>
         </div>
 
         <div class="calculator-display">
-            <div>прямое начисление бонусов:</div>
+            <div>🎯 Прямое начисление бонусов:</div>
             <div class="password-display" id="directBonusDisplay">0</div>
             <input type="hidden" id="directBonusInput" value="0">
             
@@ -465,72 +560,72 @@
                 <button class="keypad-button" onclick="addDirectBonusNumber('7')">7</button>
                 <button class="keypad-button" onclick="addDirectBonusNumber('8')">8</button>
                 <button class="keypad-button" onclick="addDirectBonusNumber('9')">9</button>
-                <button class="keypad-button red-button" onclick="clearDirectBonus()">очистить</button>
+                <button class="keypad-button red-button" onclick="clearDirectBonus()">Очистить</button>
                 <button class="keypad-button" onclick="addDirectBonusNumber('0')">0</button>
-                <button class="keypad-button red-button" onclick="deleteLastDirectBonus()">удалить</button>
+                <button class="keypad-button red-button" onclick="deleteLastDirectBonus()">Удалить</button>
             </div>
         </div>
 
-        <button class="action-button green-button" onclick="addBonusesToUser()">начислить бонусы</button>
-        <button class="action-button" onclick="showMainScreen()">новый клиент</button>
+        <button class="action-button green-button" onclick="addBonusesToUser()">✅ Начислить бонусы</button>
+        <button class="action-button" onclick="showMainScreen()">🔄 Новый клиент</button>
     </div>
 
     <!-- ЭКРАН ИСТОРИИ СКАНИРОВАНИЯ -->
     <div class="screen" id="historyScreen">
-        <div class="status-bar">история сканирования</div>
+        <div class="status-bar">📊 История сканирования</div>
         
         <div class="developer-section">
-            <div class="info-text">последние операции:</div>
+            <div class="info-text">Последние операции:</div>
             <div class="history-list" id="scanHistoryList">
                 <!-- История будет загружена здесь -->
             </div>
         </div>
         
-        <button class="action-button" onclick="showMainScreen()">назад</button>
+        <button class="action-button" onclick="showMainScreen()">↩ Назад</button>
     </div>
 
     <!-- ЭКРАН СПЕЦИАЛЬНОГО ШТРИХКОДА -->
     <div class="screen" id="specialBarcodeScreen">
         <div class="special-image">
             <img src="1.png" alt="Специальное изображение" onerror="this.style.display='none'">
-            <button class="action-button" onclick="showMainScreen()" style="margin-top: 20px;">хорошо</button>
+            <button class="action-button" onclick="showMainScreen()" style="margin-top: 30px;">👍 Хорошо</button>
         </div>
     </div>
 
     <!-- ЭКРАН ОБРАТНОГО ОТСЧЕТА -->
     <div class="screen" id="countdownScreen">
         <div class="countdown-screen">
-            <div class="countdown-text">бонусы клиенту начислены, возвращаемся на главный экран</div>
+            <div class="countdown-text">Бонусы клиенту начислены, возвращаемся на главный экран</div>
             <div class="countdown-timer" id="countdownTimer">4</div>
-            <button class="action-button red-button" onclick="cancelCountdown()">отменить начисление</button>
+            <button class="action-button red-button" onclick="cancelCountdown()">❌ Отменить начисление</button>
         </div>
     </div>
 
     <!-- ЭКРАН РАЗРАБОТЧИКА -->
     <div class="screen" id="developerScreen">
-        <div class="status-bar">developer mode | бонусная система "перец"</div>
+        <div class="status-bar">💻 Developer Mode | Бонусная система "ПЕРЕЦ"</div>
         
         <div class="developer-section">
-            <div class="info-text">история сканирования:</div>
+            <div class="info-text">📋 История сканирования:</div>
             <div class="history-list" id="devHistoryList">
                 <!-- История будет загружена здесь -->
             </div>
         </div>
         
         <div class="developer-section">
-            <div class="info-text">база данных пользователей:</div>
+            <div class="info-text">👥 База данных пользователей:</div>
             <div class="history-list" id="userDatabaseList">
                 <!-- База данных будет загружена здесь -->
             </div>
         </div>
         
         <div class="developer-section">
-            <div class="info-text">настройки системы:</div>
-            <button class="main-button" onclick="resetSystem()">сброс системы</button>
-            <button class="main-button" onclick="exportData()">экспорт данных</button>
+            <div class="info-text">⚙️ Настройки системы:</div>
+            <button class="main-button" onclick="resetSystem()">🔄 Сброс системы</button>
+            <button class="main-button" onclick="exportData()">📤 Экспорт данных</button>
         </div>
         
-        <button class="action-button" onclick="logout()">выход</button>
+        <button class="action-button" onclick="logout()">🚪 Выход</button>
     </div>
 
     <script>
@@ -682,7 +777,7 @@
             document.getElementById('barcodeDisplay').textContent = input.value;
         }
         
-        // Обработка ввода с клавиатуры
+        // Обработка ввода с клавиатуры - ИСПРАВЛЕННАЯ ВЕРСИЯ
         function setupKeyboardListener() {
             const keyboardInput = document.getElementById('keyboardInput');
             
@@ -727,6 +822,28 @@
                     }
                 }
             });
+
+            // Дополнительный обработчик для сканеров штрихкода
+            keyboardInput.addEventListener('input', function(e) {
+                if (document.getElementById('manualInputScreen').classList.contains('active')) {
+                    const value = this.value;
+                    if (value.length > 0) {
+                        // Обрабатываем ввод от сканера (может быть сразу несколько символов)
+                        const digits = value.replace(/\D/g, '');
+                        if (digits.length > 0) {
+                            document.getElementById('barcodeInput').value = digits.slice(0, 12);
+                            document.getElementById('barcodeDisplay').textContent = digits.slice(0, 12);
+                            
+                            if (digits.length >= 12) {
+                                setTimeout(() => {
+                                    findUserByBarcode();
+                                }, 50);
+                            }
+                        }
+                        this.value = '';
+                    }
+                }
+            });
         }
         
         // Поиск пользователя по штрихкоду
@@ -734,7 +851,7 @@
             const barcode = document.getElementById('barcodeInput').value;
             
             if (barcode.length !== 12) {
-                alert('ошибка: штрихкод должен содержать 12 цифр!');
+                alert('Ошибка: Штрихкод должен содержать 12 цифр!');
                 return;
             }
             
@@ -769,7 +886,7 @@
                 
                 showUserInfoScreen();
             } else {
-                alert('клиент с таким штрихкодом не найден в системе!');
+                alert('Клиент с таким штрихкодом не найден в системе!');
             }
         }
         
@@ -852,7 +969,7 @@
             }
             
             if (bonusesToAdd <= 0) {
-                alert('ошибка: введите количество бонусов для начисления!');
+                alert('Ошибка: Введите количество бонусов для начисления!');
                 return;
             }
             
@@ -1026,7 +1143,7 @@
         }
         
         function resetSystem() {
-            if (confirm('сбросить систему?')) {
+            if (confirm('Сбросить систему?')) {
                 localStorage.clear();
                 location.reload();
             }
@@ -1037,7 +1154,7 @@
                 users: userDatabase,
                 history: scanHistory
             };
-            alert('данные экспортированы в консоль');
+            alert('Данные экспортированы в консоль');
             console.log('Export Data:', data);
         }
         
