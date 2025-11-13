@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Бонусная система</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+</head>
+<body>
+    <div id="login">
+        <h2>Вход в бонусную систему</h2>
+        <input type="text" id="username" placeholder="Никнейм">
+        <input type="password" id="password" placeholder="Пароль">
+        <button onclick="login()">Войти</button>
+        <button onclick="showRegister()">Регистрация</button>
+    </div>
+
+    <div id="register" style="display:none">
+        <h2>Регистрация</h2>
+        <input type="text" id="newUsername" placeholder="Никнейм">
+        <input type="password" id="newPassword" placeholder="Пароль">
+        <button onclick="register()">Зарегистрироваться</button>
+        <button onclick="showLogin()">Назад</button>
+    </div>
+
+    <div id="dashboard" style="display:none">
+        <h2>Ваша бонусная карта</h2>
+        <div id="barcode"></div>
+        <p>Баланс: <span id="balance">0</span> бонусов</p>
+        <button onclick="logout()">Выйти</button>
+    </div>
+
+    <script>
+        const API_URL = '/.netlify/functions';
+
+        async function register() {
+            const username = document.getElementById('newUsername').value;
+            const password = document.getElementById('newPassword').value;
+
+            const response = await fetch(`${API_URL}/register`, {
+                method: 'POST',
+                body: JSON.stringify({ username, password })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                alert(`Регистрация успешна! Ваш штрихкод: ${result.barcode}`);
+                showLogin();
+            }
+        }
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const response = await fetch(`${API_URL}/login`, {
+                method: 'POST',
+                body: JSON.stringify({ username, password })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                localStorage.setItem('user', JSON.stringify(result.user));
+                showDashboard(result.user);
+            } else {
+                alert('Ошибка входа');
+            }
+        }
+
+        function showDashboard(user) {
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('balance').textContent = user.balance;
+            
+            // Генерация штрихкода
+            JsBarcode("#barcode", user.barcode, {
+                format: "CODE128",
+                displayValue: true
+            });
+        }
+
+        function showRegister() {
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('register').style.display = 'block';
+        }
+
+        function showLogin() {
+            document.getElementById('register').style.display = 'none';
+            document.getElementById('login').style.display = 'block';
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('login').style.display = 'block';
+        }
+
+        // Проверка авторизации при загрузке
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) {
+            showDashboard(JSON.parse(savedUser));
+        }
+    </script>
+</body>
+</html>
