@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бонусная система - POS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            max-width: 100%;
+        }
+        
+        .main-button {
+            flex: 1;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            margin: 10px 0;
+            font-size: 4em;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .main-button:active {
+            background: #388E3C;
+            transform: scale(0.98);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .icon {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+        }
+        
+        .secondary-button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 30px 20px;
+            font-size: 2.5em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            margin: 10px 0;
+        }
+        
+        .secondary-button:active {
+            background: #1976D2;
+            transform: scale(0.98);
+        }
+        
+        .manual-input-screen {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        
+        .input-title {
+            font-size: 3em;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .barcode-input {
+            flex: 1;
+            font-size: 4em;
+            text-align: center;
+            border: 4px solid #2196F3;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .button-row {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .number-button {
+            flex: 1;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 25px;
+            font-size: 2.5em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .action-button {
+            flex: 1;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 25px;
+            font-size: 2em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        
+        .clear-button {
+            background: #FF9800;
+        }
+        
+        .back-button {
+            background: #9E9E9E;
+        }
+        
+        .delete-button {
+            background: #f44336;
+            font-size: 1.8em;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .flex {
+            display: flex !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Главный экран -->
+    <div class="container" id="mainScreen">
+        <button class="main-button" onclick="showScanner()">
+            <div class="icon">📷</div>
+            ОТСКАНИРУЙТЕ ШК КЛИЕНТА<br>ИЗ ПРИЛОЖЕНИЯ "ПЕРЕЦ"
+        </button>
+        
+        <button class="secondary-button" onclick="showManualInput()">
+            📝 РУЧНОЙ ВВОД ШК
+        </button>
+    </div>
+
+    <!-- Экран ручного ввода -->
+    <div class="container manual-input-screen" id="manualInputScreen">
+        <div class="input-title">ВВЕДИТЕ ШТРИХКОД</div>
+        
+        <input type="text" class="barcode-input" id="barcodeInput" placeholder="123456789012" maxlength="12" readonly>
+        
+        <div class="button-row">
+            <button class="number-button" onclick="addNumber('1')">1</button>
+            <button class="number-button" onclick="addNumber('2')">2</button>
+            <button class="number-button" onclick="addNumber('3')">3</button>
+        </div>
+        
+        <div class="button-row">
+            <button class="number-button" onclick="addNumber('4')">4</button>
+            <button class="number-button" onclick="addNumber('5')">5</button>
+            <button class="number-button" onclick="addNumber('6')">6</button>
+        </div>
+        
+        <div class="button-row">
+            <button class="number-button" onclick="addNumber('7')">7</button>
+            <button class="number-button" onclick="addNumber('8')">8</button>
+            <button class="number-button" onclick="addNumber('9')">9</button>
+        </div>
+        
+        <div class="button-row">
+            <button class="number-button clear-button" onclick="clearInput()">ОЧИСТИТЬ</button>
+            <button class="number-button" onclick="addNumber('0')">0</button>
+            <button class="number-button delete-button" onclick="deleteLast()">⌫ УДАЛИТЬ</button>
+        </div>
+        
+        <button class="action-button" onclick="processBarcode()">✅ ПОДТВЕРДИТЬ</button>
+        <button class="action-button back-button" onclick="showMainScreen()">↩ НАЗАД</button>
+    </div>
+
+    <script>
+        // Переключение между экранами
+        function showMainScreen() {
+            document.getElementById('mainScreen').classList.remove('hidden');
+            document.getElementById('manualInputScreen').classList.remove('flex');
+        }
+        
+        function showManualInput() {
+            document.getElementById('mainScreen').classList.add('hidden');
+            document.getElementById('manualInputScreen').classList.add('flex');
+            document.getElementById('barcodeInput').value = '';
+        }
+        
+        function showScanner() {
+            // Здесь будет интеграция со сканером штрихкодов
+            alert('Режим сканирования активирован. Наведите камеру на штрихкод.');
+            // В реальной реализации здесь будет вызов API сканера
+        }
+        
+        // Управление вводом для ручного ввода
+        function addNumber(number) {
+            const input = document.getElementById('barcodeInput');
+            if (input.value.length < 12) {
+                input.value += number;
+            }
+        }
+        
+        function clearInput() {
+            document.getElementById('barcodeInput').value = '';
+        }
+        
+        function deleteLast() {
+            const input = document.getElementById('barcodeInput');
+            input.value = input.value.slice(0, -1);
+        }
+        
+        function processBarcode() {
+            const barcode = document.getElementById('barcodeInput').value;
+            if (barcode.length === 12) {
+                // Здесь будет вызов API для обработки штрихкода
+                alert(`Штрихкод ${barcode} принят. Переход к начислению бонусов.`);
+                // В реальной реализации здесь будет переход к экрану начисления бонусов
+            } else {
+                alert('Штрихкод должен содержать 12 цифр!');
+            }
+        }
+        
+        // Поддержка физической клавиатуры (если подключена к POS-системе)
+        document.addEventListener('keydown', function(event) {
+            if (event.key >= '0' && event.key <= '9') {
+                addNumber(event.key);
+            } else if (event.key === 'Backspace') {
+                deleteLast();
+            } else if (event.key === 'Enter') {
+                processBarcode();
+            } else if (event.key === 'Escape') {
+                showMainScreen();
+            }
+        });
+    </script>
+</body>
+</html>
